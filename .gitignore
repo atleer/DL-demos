@@ -10,6 +10,13 @@
 *.pyc
 *.pth
 
+# quarto notebook render output
+*.js
+*.css
+*.html
+*.woff
+*.json
+
 
 notes
 
