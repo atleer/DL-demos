@@ -54,6 +54,16 @@ torch.tensor(10)
 | --- | --- |
 | `torch.matmul(A,B)` | Performs matrix multiplication on the two tensors A and B. |
 
+::: {#exm-}
+Perform matrix multiplication on the two tensors A and B.
+:::
+
+```{python}
+A = torch.tensor([[1,2], [3,4], [5,6]])
+B = torch.tensor([[7,8,9], [10,11,12]])
+torch.matmul(A,B)
+```
+
 ## Section 4: Convert Tensors to Other Python Objects and Set the Device
 
 | Code | Description |
