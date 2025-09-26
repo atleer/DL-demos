@@ -71,8 +71,6 @@ torch.matmul(A,B)
 | `x = torch.tensor(2)` <br> `float(x)` | Turn torch tensor containing scalar into float number.|
 | `x = torch.tensor(2.4)` <br> `x.item()` | Get value of tensor as standard Python number (the type is automatically recognized).|
 | `x = torch.tensor([1, 2, 3])` <br> `x.numpy()` | Returns content of tensor as numpy array.|
-| `x = torch.tensor([1, 2, 3])` <br> `x.numpy()` | Returns content of tensor as numpy array.|
-
 ::: {#exm-}
 Convert the tensor object of the scalar number 5 into a float object.
 :::
