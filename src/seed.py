@@ -69,6 +69,3 @@ def set_device():
     print("GPU is enabled in this notebook.")
 
   return device
-SEED = 2021
-set_seed(seed=SEED)
-DEVICE = set_device()
