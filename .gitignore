@@ -16,6 +16,7 @@
 *.html
 *.woff
 *.json
+*.png
 
 **/plan*
 **/announcement**

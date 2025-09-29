@@ -1,7 +1,7 @@
 ---
-title: "Working with Data in PyTorch and torchvision?"
-description: "Getting standard datasets from torchvision, transforming data, using dataloaders, preparing your own dataset"
-subtitle: "2: Working with Data in PyTorch"
+title: "Create Neural Networks with PyTorch"
+description: ""
+subtitle: "3: Create Neural Networks"
 engine: Jupyter
 #jupyter: pytorch
 title-block-banner: true
@@ -180,7 +180,7 @@ loss_function
 Calculate the loss
 
 ```{python}
-criterion(output, y_samples)
+loss_function(output, y_samples)
 ```
 
 
@@ -206,7 +206,7 @@ model = SimpleNeuralNet()
 
 loss_function = nn.CrossEntropyLoss()
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adagrad(model.parameters(), lr=0.01)
 
 optimizer.zero_grad()
 ```

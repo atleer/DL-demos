@@ -31,6 +31,8 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
 import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 ```
 
 ## Section 1: Download Standard Datasets from Torchvision
@@ -105,9 +107,26 @@ train_data
 ```
 
 ```{python}
+
+mean_cifar10 = (0.4914, 0.4822, 0.4465)
+std_cifar10 = (0.2023, 0.1994, 0.2010)
+
+# NOTE: Look up how the mean and std values for normalization are calculated exactly. Simply mean and std across all pixels and images in dataset?
+train_data = datasets.CIFAR10(
+    root="data/raw",
+    train=True,
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean_cifar10, std_cifar10)
+    ])
+)
+```
+
+```{python}
 test_data = datasets.CIFAR10(root="data/raw",train=False)
 test_data
 ```
+
 
 ```{python}
 train_dataloader = DataLoader(train_data, batch_size=64)
