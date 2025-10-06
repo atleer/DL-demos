@@ -1,0 +1,209 @@
+---
+title: "Working with Data in PyTorch and torchvision"
+description: "Getting standard datasets from torchvision, transforming data, using dataloaders, preparing your own dataset"
+subtitle: "3: Working with Data in PyTorch"
+engine: Jupyter
+#jupyter: pytorch
+title-block-banner: true
+freeze: auto
+
+execute:
+    eval: true
+
+author:
+  - name: "Dr. Atle E. Rimehaug"
+
+format:
+  html: default
+  ipynb: default
+format-links: false
+---
+
+## Setup
+
+### Import Libraries
+
+```{python}
+import torch
+from torchvision import datasets
+from torchvision import transforms
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+```
+
+## Section 1: Download Standard Datasets from Torchvision
+
+| Code | Description |
+| --- | --- |
+| `datasets.CIFAR100(root="<data_dir>", download=True)` | Downloads the CIFAR100 image dataset and puts it in the directory specified by the `root` parameter. |
+| `image, label = cifar10_data[5]` | Get the image and the label of the image at index number `5` |
+| `plt.imshow(image)` | Display the image. |
+
+::: {#exm-}
+Download the MNIST dataset, which contains images of handdrawn digits.
+:::
+
+```{python}
+mnist_data = datasets.MNIST(
+    root="data/raw",
+    download=True,
+)
+mnist_data
+```
+
+```{python}
+idx_image = 1
+image, label = mnist_data[idx_image]
+```
+
+```{python}
+plt.imshow(image)
+```
+
+## Section 2: Transforming Data (normalize)
+
+| Code | Description |
+| --- | --- |
+| `datasets.CIFAR10("data/raw",transform=transforms.ToTensor())` | ``transforms.ToTensor()`` converts PIL images or numpy arrays to tensors and scales the data so that all pixel values are within a range from 0 to 1. |
+
+```{python}
+cifar10_data = datasets.CIFAR10(
+    root="data/raw",
+    download=True,
+    transform=transforms.ToTensor(),
+)
+cifar10_data
+```
+
+```{python}
+
+idx_image = 7
+image, label = cifar10_data[idx_image]
+```
+
+```{python}
+plt.figure(figsize = (3,3))
+plt.imshow(image.permute(1,2,0))
+```
+
+```{python}
+label
+```
+
+## Section 3: Batch Data with Dataloaders
+
+| Code | Description |
+| --- | --- |
+| `datasets.CIFAR10(root='data/raw', train=True)` | Load the **training** data of the CIFAR10 dataset. |
+| `datasets.CIFAR10(root='data/raw', train=False)` | Load the **test** data of the CIFAR10 dataset. |
+| `DataLoader(train_data, batch_size = 64)` | Create a dataloader object to be used for loading and iterating over dataset during training. `batch_size` sets how many data points are loaded together in each iteration, default value is 1. |
+
+```{python}
+train_data = datasets.CIFAR10(root='data/raw', train=True, transform=transforms.ToTensor())
+train_data
+```
+
+::: {#exm-}
+Get the training data of the CIFAR10 dataset and normalize it.
+:::
+
+```{python}
+
+mean_cifar10 = (0.4914, 0.4822, 0.4465)
+std_cifar10 = (0.2023, 0.1994, 0.2010)
+
+# NOTE: Look up how the mean and std values for normalization are calculated exactly. Simply mean and std across all pixels and images in dataset?
+train_data = datasets.CIFAR10(
+    root="data/raw",
+    train=True,
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean_cifar10, std_cifar10)
+    ])
+)
+```
+
+```{python}
+test_data = datasets.CIFAR10(root="data/raw",train=False)
+test_data
+```
+
+
+```{python}
+train_dataloader = DataLoader(train_data, batch_size=64)
+train_dataloader
+```
+
+```{python}
+batch_images, batch_labels = next(iter(train_dataloader))
+plt.figure(figsize=(3,3))
+plt.imshow(batch_images[5].permute(1,2,0))
+```
+## Section 4: Prepare Your Own Data for PyTorch
+
+| Code | Description |
+| --- | --- |
+| `` |  |
+
+
+```{python}
+class WineDataset(Dataset):
+    def __init__(self):
+        # load data
+        df = pd.read_csv('data/raw/wine.csv')
+        self.n_samples = len(df)
+
+        self.x_data = torch.from_numpy(df.drop('Wine', axis=1).values)
+        self.y_data = torch.from_numpy(np.expand_dims(df['Wine'].values, axis=1))
+
+    def __len__(self):
+        return self.n_samples
+    
+    def __getitem__(self,index):
+        return self.x_data[index], self.y_data[index]
+```
+
+```{python}
+wine_data = WineDataset()
+wine_data
+```
+
+```{python}
+dataloader = DataLoader(wine_data)
+dataloader
+```
+
+```{python}
+# split into train, validation, and test data?
+```
+
+```{python}
+feature, label = next(iter(dataloader))
+feature, label
+```
+
+```{python}
+import pandas as pd
+
+df = pd.read_csv('data/raw/wine.csv')
+np.expand_dims(df['Wine'].values, axis=1)
+df
+```
+
+```{python}
+import numpy as np
+xy = np.loadtxt('data/raw/wine.csv', delimiter=',', dtype=np.float32, skiprows=1)
+xy[:,1:]
+```
+
+```{python}
+xy[:,[0]]
+```
+
+```{python}
+df.drop('Wine', axis=1).values
+```

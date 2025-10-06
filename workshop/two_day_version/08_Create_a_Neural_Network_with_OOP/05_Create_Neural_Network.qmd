@@ -1,0 +1,251 @@
+---
+title: "Create Neural Networks with Object-Oriented Programming"
+description: ""
+subtitle: "4: Create Neural Networks"
+engine: Jupyter
+#jupyter: pytorch
+title-block-banner: true
+freeze: auto
+
+execute:
+    eval: true
+
+author:
+  - name: "Dr. Atle E. Rimehaug"
+
+format:
+  html: default
+  ipynb: default
+format-links: false
+---
+
+## Setup
+
+### Import Libraries
+```{python}
+import torch
+from torch import nn
+
+from sklearn.datasets import make_moons
+import pandas as pd
+import matplotlib.pyplot as plt
+
+```
+
+### Generate Data
+
+```{python}
+X, y = make_moons(256, noise=0.1)
+
+df = pd.DataFrame({'x0': X[:, 0], 'x1': X[:,1], 'y': y})
+# Create 2D numpy array from x0 and x1 columns
+X_orig = df[['x0', 'x1']].to_numpy()
+
+# Create a 1D numpy array from the y column
+y_orig = df['y'].to_numpy()
+
+plt.scatter(X_orig[:,0], X_orig[:,1], s = 40, c=y_orig)
+```
+
+## Section 1: Create Layers of Neurons and Pass Input to It
+
+| Code | Description |
+| --- | --- |
+| `x = torch.tensor(2)` <br> `float(x)` | Turn torch tensor containing scalar into float number.|
+
+::: {#exm-}
+Create a single layer of 16 neurons that takes in two features.
+:::
+
+```{python}
+nn.Linear(2, 16)
+```
+
+::: {#exr-}
+Create a rectified linear unit.
+:::
+
+::: {#sol-}
+:::
+```{python}
+nn.ReLU()
+```
+
+::: {#exr-}
+Create a sequence of layers with a rectified linear unit between them. The first layer should take two input features, and consisto of 16 neurons, the second layer should take in the 16 outputs from the previous layer and output two features.
+*Hint:* See reference table.
+:::
+
+::: {#sol-}
+:::
+```{python}
+nn.Sequential(
+    nn.Linear(2,16),
+    nn.ReLU(),
+    nn.Linear(16,2)
+)
+```
+
+::: {#exm-}
+Make a function that creates the same sequence of layers when you call it.
+:::
+
+```{python}
+def create_layers_nn():
+    net = nn.Sequential(
+        nn.Linear(2,16),
+        nn.ReLU(),
+        nn.Linear(16,2)
+    )
+    return net
+
+create_layers_nn() 
+```
+
+```{python}
+def forward(x, layers):
+    return layers(x)
+```
+
+```{python}
+# Convert the 2D points to a tensor
+X = torch.tensor(X_orig, dtype = torch.float32)
+
+# Convert labels to long integer tensor
+y = torch.from_numpy(y_orig).type(torch.LongTensor)
+```
+
+```{python}
+X_samples = X[:200]
+y_samples = y[:200]
+
+layers = create_layers_nn()
+output = forward(X_samples, layers)
+```
+
+- Predict may be a bit too much already
+```{python}
+def predict(x, layers):
+    output = forward(x, layers)
+    prediction = torch.argmax(output, dim=1)
+    return prediction
+
+y_pred = predict(X_samples, layers)
+y_pred
+```
+
+```{python}
+(y_pred - y_samples).sum()
+```
+
+## Section 2: Put Network and Forward Pass Together in Class
+
+```{python}
+class SimpleNeuralNet(nn.Module):
+    def __init__(self):
+        super(SimpleNeuralNet, self).__init__()
+
+        self.layers = nn.Sequential(
+            nn.Linear(2, 16),
+            nn.ReLU(),
+            nn.Linear(16,2)
+        )
+
+    def forward(self, x):
+        return self.layers(x)
+```
+
+```{python}
+model = SimpleNeuralNet()
+
+output = model(X_samples)
+```
+
+```{python}
+y_pred = torch.argmax(output, dim=1)
+y_pred
+```
+
+## Section 3: The Loss Function and the optimizer
+
+
+::: {#exm-}
+Create a cross-entropy loss function.
+:::
+```{python}
+loss_function = nn.CrossEntropyLoss()
+loss_function
+```
+
+Calculate the loss
+
+```{python}
+loss_function(output, y_samples)
+```
+
+
+::: {#exr-}
+Create a stochastic gradient descent optimizer.
+:::
+
+::: {#sol-}
+:::
+```{python}
+optimizer = torch.optim.SGD(model.parameters())
+optimizer
+```
+
+```{python}
+optimizer.step()
+```
+
+## Section 4: Train the Network
+
+```{python}
+model = SimpleNeuralNet()
+
+loss_function = nn.CrossEntropyLoss()
+
+optimizer = torch.optim.Adagrad(model.parameters(), lr=0.01)
+
+optimizer.zero_grad()
+```
+
+```{python}
+
+train_losses = []
+num_epochs = 1000
+for epoch in range(num_epochs):
+    optimizer.zero_grad()
+
+    output = model(X_samples)
+
+    loss = loss_function(output, y_samples)
+
+    train_losses.append(loss.item())
+
+    loss.backward()
+
+    optimizer.step()
+```
+
+```{python}
+plt.plot(train_losses)
+```
+
+```{python}
+X_test = X[200:]
+y_test = y[200:]
+```
+
+```{python}
+output = model(X_test)
+
+y_pred = torch.argmax(output, dim=1)
+```
+
+```{python}
+accuracy = (y_pred==y_test).sum()/len(y_test)
+accuracy
+```
+
