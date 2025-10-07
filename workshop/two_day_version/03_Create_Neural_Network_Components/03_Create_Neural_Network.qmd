@@ -177,13 +177,13 @@ net(X_samples)
 
 | Code | Description |
 | --- | --- |
-| `loss_function = nn.MSELoss()` | Creates a mean squared error (MSE) loss function and assign it to a variable named `loss_function`. Typically used for regression problems. |
+| `loss_function = nn.MSELoss()` | Creates a mean squared error (MSE) loss function and assigns it to a variable named `loss_function`. Typically used for regression problems. |
 | `nn.CrossEntropyLoss()` | Creates a cross-entropy loss function. Used for classification problems.|
 | `nn.NLLLoss()` | Creates a negative log-likelihood loss function. Used for classification problems. Expects different input format than cross-entropy loss. |
 | `loss_function(y_net, y_true)` | Calculates the loss between the y-values given as output by the network `y_net` and the true y-values from the data `y_true`. |
-| `optim.SGD(net.parameters(), lr=0.01)` | Creates a stochastic gradient descent (GD) optimizer with a learning rate `lr` of 0.01 (the default value is 0.001). |
+| `optim.SGD(net.parameters(), lr=0.01, momentum = 0.99)` | Creates a stochastic gradient descent (GD) optimizer with a learning rate `lr` of 0.01 (the default value is 0.001) and ``momentum`` of 0.99 (the default value is 0.9). |
 | `optim.Adagrad(net.parameters())` | Creates an adaptive gradient descent optimizer.|
-| `optim.ADAM(net.parameters(), lr=0.01, momentum = 0.99)` | Creates an adaptive gradient descent with momentum optimizer with learning rate `lr = 0.01` and ``momentum = 0.99`` (the default value is 0.9).|
+| `optim.ADAM(net.parameters())` | Creates an adaptive moment optimizer .|
 
 
 ::: {#exm-}
@@ -251,7 +251,7 @@ optimizer
 ```
 
 ::: {#exr-}
-Create an adaptive gradient descent optimizer.
+Create an adaptive gradient (Adagrad) optimize.
 :::
 
 ::: {#sol-}
@@ -262,19 +262,36 @@ optimizer
 ```
 
 ::: {#exr-}
-Create an ADAM optimizer with `momentum = 0.95` and learning rate `lr = 0.1`.
+Create an adaptive moment (Adam) optimizer with learning rate ``lr = 0.01``.
 :::
 
 ::: {#sol-}
 :::
 ```{python}
-optimizer = torch.optim.ADAM(net.parameters(), lr = 0.1, momentum=0.95)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.01)
+optimizer
+```
+
+::: {#exr-}
+Create a gradient descent optimizer with `momentum = 0.95` and learning rate `lr = 0.01`.
+:::
+
+::: {#sol-}
+:::
+```{python}
+optimizer = torch.optim.SGD(net.parameters(), lr = 0.01, momentum=0.95)
 optimizer
 ```
 
 ## Section 3: Calculate the Accuracy
 
+| Code | Description |
+| --- | --- |
+| `a == b` | Compares each element of the tensors (or arrays) `a` and `b` and returns a tensor of boolean (`True` or `False`) values indicating which elements are the same (`True`) and different (`False`). |
+| `(a == b).sum()` or `torch.sum(a == b)`| Sums all elements where the condition `a == b` is `True`. `True` is counted as 1, `False` as 0. |
+| `(a == b).sum() / len(a)` | Calculates proportion of elements in `a` where the element is equal to the corresponding element in `b`.|
 
+Run the cell below to create a network, select a subset of the data, and pass this subset through the network to get an output `y_net`.
 
 ```{python}
 net = nn.Sequential(
@@ -282,23 +299,45 @@ net = nn.Sequential(
     nn.ReLU(),
     nn.Linear(16,2)
 )
-```
 
-```{python}
 # select subset of data
-X_samples = X[:100]
-y_samples = y[:100]
+X_samples = X[:200]
+y_samples = y[:200]
 
 y_net = net(X_samples)
+```
+
+The output of the network is a score for each class that reflects the networks belief that a data point corresponds to a given class. This is not the same as a class label, so to get the output in the form of a class guess by the network, we have to determine which class the network thinks that a data point is most likely to belong to using the outputted scores.
+
+::: {#exr-}
+Find the column index (which corresponds to the class label) at which the score is highest for every data point. *Hint*: torch's argmax function may be useful here. If you display the result it should be a tensor containing only 1's and 0's.
+:::
+
+::: {#sol-}
+:::
+```{python}
 y_pred = torch.argmax(y_net, dim=1)
 y_pred
 ```
+
+::: {#exr-}
+Now, the network prediction can be compared directly with the true labels from the data. Check how many of the network predicted classes match the true labels.
+:::
+
+::: {#sol-}
+:::
+```{python}
+(y_pred == y_samples).sum()
+```
+
+::: {#exr-}
+Divide the total number of matches by the total number of data points in the sample. This should be a number between 0 and 1 and is the accuracy of the network prediction.
+:::
 
 ```{python}
 accuracy = (y_pred == y_samples).sum()/len(y_samples)
 accuracy
 ```
-
 
 ## Section 4: Train the Network
 
