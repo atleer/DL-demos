@@ -341,50 +341,77 @@ accuracy
 
 ## Section 4: Train the Network
 
+| Code | Description |
+| --- | --- |
+| `optimizer.zero_grad()` | Zero out gradients. |
+| `loss.backward()` | Do backpropagation. |
+| `optimizer.step()` | Update parameters of network using gradients calculated during backpropagation. |
+
+Run the cell below to define a network, select a subset of the data, and define an optimizer.
+
 ```{python}
+net = nn.Sequential(
+    nn.Linear(2,16),
+    nn.ReLU(),
+    nn.Linear(16,2)
+)
 
-loss_function = nn.CrossEntropyLoss()
+# select subset of data
+X_samples = X[:200]
+y_samples = y[:200]
 
-optimizer = torch.optim.Adagrad(net.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.01)
+```
 
+
+::: {#exr-}
+Set the gradients to zero for the optimizer defined above. This is necessary to avoid that  gradients accumulate over successive iterations during training. The gradients should only be calculated from the loss in the current iteration.
+:::
+
+::: {#sol-}
+:::
+```{python}
 optimizer.zero_grad()
 ```
 
+
+::: {#exr-}
+In the cell below, the loss is calculated for the output of the network after passing `X_samples` as input to it. Do backpropagation on the computed loss. This calculates the gradients for this iteration.
+:::
+
 ```{python}
+loss_function = nn.CrossEntropyLoss()
 
-train_losses = []
-num_epochs = 1000
-for epoch in range(num_epochs):
-    optimizer.zero_grad()
+output = net(X_samples)
 
-    output = net(X_samples)
-
-    loss = loss_function(output, y_samples)
-
-    train_losses.append(loss.item())
-
-    loss.backward()
-
-    optimizer.step()
+loss = loss_function(output, y_samples)
+print(loss.item())
 ```
 
+::: {#sol-}
+:::
 ```{python}
-plt.plot(train_losses)
+loss.backward()
 ```
 
+::: {#exr-}
+Update the parameters of the network.
+:::
+
 ```{python}
-X_test = X[200:]
-y_test = y[200:]
+optimizer.step()
 ```
 
-```{python}
-output = net(X_test)
+::: {#exr-}
+Pass `X_samples` as input to the network again and calculate and print the loss anew for this output. Compare to the loss printed in the first exercise of this section. Is it different? If so, what does that suggest?
+:::
 
-y_pred = torch.argmax(output, dim=1)
-```
-
+::: {#sol-}
+:::
 ```{python}
-accuracy = (y_pred==y_test).sum()/len(y_test)
-accuracy
+output = net(X_samples)
+
+loss = loss_function(output, y_samples)
+print(loss.item())
 ```
 
