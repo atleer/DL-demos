@@ -1,6 +1,6 @@
 ---
 title: "Create Neural Networks with PyTorch"
-description: ""
+description: "Neural Networks without Object-oriented Programming"
 subtitle: "4: Create Neural Networks"
 engine: Jupyter
 #jupyter: pytorch
@@ -76,17 +76,27 @@ nn.Linear(2, 16)
 Create a single layer of 8 neurons that takes in one feature.
 :::
 
-::: {#sol-1}
+::: {#sol-}
 :::
 ```{python}
 nn.Linear(1,8)
 ```
 
 ::: {#exr-}
+Create a single layer of 10 neurons that takes in 15 features.
+:::
+
+::: {#sol-}
+:::
+```{python}
+nn.Linear(15,10)
+```
+
+::: {#exr-}
 Create a rectified linear unit activation function.
 :::
 
-::: {#sol-2}
+::: {#sol-}
 :::
 ```{python}
 nn.ReLU()
@@ -96,7 +106,7 @@ nn.ReLU()
 Create a hyperbolic tangent activation function.
 :::
 
-::: {#sol-3}
+::: {#sol-}
 :::
 ```{python}
 nn.Tanh()
@@ -105,7 +115,7 @@ nn.Tanh()
 Create a softmax activation function.
 :::
 
-::: {#sol-4}
+::: {#sol-}
 :::
 ```{python}
 nn.Softmax()
@@ -122,7 +132,7 @@ Sequential(  <br>
 )
 :::
 
-::: {#sol-5}
+::: {#sol-}
 :::
 ```{python}
 nn.Sequential(
