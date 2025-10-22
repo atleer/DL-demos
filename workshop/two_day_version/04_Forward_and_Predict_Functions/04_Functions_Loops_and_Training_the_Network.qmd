@@ -87,12 +87,11 @@ def subtract(a, b):
     return output
 ```
 
-
 ::: {#exr-}
 Write a for loop that prints the numbers **0** to **9**.
 :::
 
-::: {#sol-9}
+::: {#sol-}
 :::
 ```{python}
 for num in range(9):
@@ -103,7 +102,7 @@ for num in range(9):
 Write a for loop that prints the numbers **5** to **10**.
 :::
 
-::: {#sol-10}
+::: {#sol-}
 :::
 ```{python}
 for i in range(5,10):
@@ -114,7 +113,7 @@ for i in range(5,10):
 Write a for loop that counts from **0** to **100** in steps of **10**.
 :::
 
-::: {#sol-11}
+::: {#sol-}
 :::
 ```{python}
 for j in range(0,100,10):
@@ -125,7 +124,7 @@ for j in range(0,100,10):
 Use a loop to print all `fruits` and `colors`, for example `banana is yellow"`.
 :::
 
-::: {#sol-12}
+::: {#sol-}
 :::
 ```{python}
 fruits = ["banana", "orange", "cherry"]
@@ -156,7 +155,7 @@ squared_numbers
 Write a loop that multiplies each element in the list `numbers` by 4 and store the results in a new list called `multiplied_numbers`. Display `multiplied_numbers` to check that it is correct.
 :::
 
-::: {#sol-13}
+::: {#sol-}
 :::
 ```{python}
 numbers = [4, 6, 12, 50]
@@ -170,21 +169,32 @@ for num in numbers:
 multiplied_numbers
 ```
 
-## Section 2: 
+## Section 2: Train the Network
+
+| Code | Description |
+| --- | --- |
+| `def sum_input(a,b)` <br> &nbsp;&nbsp;&nbsp;&nbsp; `output = a+b` <br> &nbsp;&nbsp;&nbsp;&nbsp;  `return output` | Creates a function `sum_input` that takes two variables `a` and `b` as input and returns the sum of them. |
 
 ```{python}
+net = nn.Sequential(
+    nn.Linear(2,16),
+    nn.ReLU(),
+    nn.Linear(16,2)
+)
+
+# select subset of data
+X_samples = X[:200]
+y_samples = y[:200]
+
+optimizer = torch.optim.Adam(net.parameters(), lr=0.01)
 
 loss_function = nn.CrossEntropyLoss()
-
-optimizer = torch.optim.Adagrad(net.parameters(), lr=0.01)
-
-optimizer.zero_grad()
 ```
 
 ```{python}
-
 train_losses = []
 num_epochs = 1000
+
 for epoch in range(num_epochs):
     optimizer.zero_grad()
 
@@ -197,4 +207,8 @@ for epoch in range(num_epochs):
     loss.backward()
 
     optimizer.step()
+```
+
+```{python}
+plt.plot(train_losses)
 ```
