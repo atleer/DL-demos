@@ -45,6 +45,7 @@ class convdown(nn.Module):
         super().__init__()
         self.conv = nn.Sequential()
         
+        # TODO: I don't think the for loop is necessary. Remove and test
         # Add two convbatchrelu blocks
         for t in range(2):
             if t == 0:
